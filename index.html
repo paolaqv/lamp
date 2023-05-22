@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+  <style>
+          .ampliacion:hover{
+              transform: scale(1.1);
+          }
+          .changecolor:hover{
+              background-color:#298095;
+              color: white;
+              border: solid 3px #cf961c;
+          }
+  </style>   
+  <head>
+    <title>ESP32 IOT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="http://cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.7/all/gauge.min.js"></script>
+  
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <style>
+    body {
+      min-width: 310px;
+    	max-width: 800px;
+    	height: 400px;
+      margin: 0 auto;
+    }
+    h2 {
+      font-family: Arial;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+  </style>
+  
+  </head>
+  <body>
+    <p><img src="https://i.ibb.co/vqFqz08/UCB.jpg" margin= "auto" alt="ucba" width= "1230" height="350"></p>
+
+  <header>
+   <div style='margin-left: 2vw;display: inline-flex; height:150px;'><img
+        src="https://i.ibb.co/qjNV8vY/LOGOIOT.png">
+      <p style='margin-left: 10vw; margin-right: 10vw; color: #e98a25; font-size: 3vw;'>BETA</p>
+      <p style='margin-left: 10vw; margin-right: 10vw; color: #e98a25; font-size: 3vw;'>FECHA</p>
+      <p style='margin-left: 10vw; margin-right: 10vw; color: #e98a25; font-size: 3vw;'>GRAFICA</p>
+   </div>
+
+  </header>
+    <div class="topnav">
+      <h1>ESP32 GAUGE</h1>
+    </div>
+    
+    <div class="content">
+      <div class="card-grid">
+        <div class="card">
+          <p class="card-title">voltaje</p>
+          <canvas id="gauge-temperature"></canvas>
+        </div>
+        <div class="card">
+          <p class="card-title">temperatura</p>
+          <canvas id="gauge-humidity"></canvas>
+        </div>
+       
+
+      </div>
+    </div>
+	
+    <p>
+	<div id="chart-ADC" class="container"></div>
+    </p>
+    <P></P>
+
+  
+    <p>Estado GPIO : <strong> %ESTADO%</strong></p>
+    <p>
+    <a href="/on"><button class="button">ON</button></a>
+    <a href="/off"><button class="button button2">OFF</button></a>
+    </p>
+  <p></p>
+
+  
+  
+    <footer>
+      <p></p>
+      
+      <div style="display: inline-flex;">
+        <div style="display: flex; margin-right:2vw;">
+          <div style="text-align: center;">
+            <img src="https://i.ibb.co/ys85qzp/foto-Paola.jpg" alt="paolaquispe" style="width: 15vw;">
+          </div>
+        </div>
+        <div style="display: flex; margin-right:10vw;">
+          <div style="text-align: left;">
+            
+          </div>
+        </div>
+        <div style="display: flex; ">
+          <div style="text-align: left;">
+            <p>paola Andrea Quispe vargas <br> paolaandreaquispev@gmail.com <br>61163241<br>&#169 BETA</p>
+          </div>
+        </div>
+        
+      </div>
+      
+    </footer>
+  
+  </body>
+  <script src="script.js"></script>
+
+ <script>
+var chartADC = new Highcharts.Chart({
+  chart:{ renderTo:'chart-ADC' },
+  title: { text: 'ADC' },
+  series: [{
+    showInLegend: false,
+    data: []
+  }],
+  plotOptions: {
+    line: { animation: false,
+      dataLabels: { enabled: true }
+    },
+    series: { color: '#18009c' }
+  },
+  xAxis: {
+    type: 'datetime',
+    dateTimeLabelFormats: { second:'%S' }
+  },
+  yAxis: {
+    title: { text: 'Datos del ADC A0' }
+  },
+  credits: { enabled: false }
+});
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var x = (new Date()).getTime(),
+          y = parseFloat(this.responseText);
+      //console.log(this.responseText);
+      if(chartADC.series[0].data.length > 40) {
+        chartADC.series[0].addPoint([x, y], true, true, true);
+      } else {
+        chartADC.series[0].addPoint([x, y], true, false, true);
+      }
+    }
+  };
+  xhttp.open("GET", "/ADC", true);
+  xhttp.send();
+}, 1000 ) ;
+
+
+setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("RSSI_tabla").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/RSSI", true);
+    xhttp.send();
+  }, 10000);
+
+  setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("IP").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/ip", true);
+    xhttp.send();
+  }, 10000);
+
+  setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("hostname").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/hostname", true);
+    xhttp.send();
+  }, 10000);
+
+  setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("PSK").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/PSK", true);
+    xhttp.send();
+  }, 10000);
+
+  setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("BSSI").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/BSSI", true);
+    xhttp.send();
+  }, 10000);
+
+  setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("RSSI").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/RSSI_T", true);
+    xhttp.send();
+  }, 10000);
+ 
+</script>
+</html>
